@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const signupschema=mongoose.Schema({
-firstname:{
+Firstname:{
     type:String,
     required:true
 },
-lastname:{
+Lastname:{
     type:String,
     required:true
 },
@@ -16,6 +16,10 @@ Email:{
     type:String,
     require:true,
     unique: true
+},
+Password:{
+    type:String,
+    required:true
 }
 })
 

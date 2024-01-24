@@ -1,6 +1,6 @@
 const mongoose=require("mongoose");
 const loginschema=mongoose.Schema({
-username:{
+Username:{
     type:String,
     required:true
 },
