@@ -1,29 +1,19 @@
 module.exports = {
-  out: function (request, response, data) {
-    if (data.statusCode === 401) {
-      response.status(data.statusCode).json({
-        message: "unauthorized user"
-      });
-    } else if (data.statusCode === 500) {
-      response.status(data.statusCode).json({
-        message: "Internal server error or invalid data"
-      });
-    } else if (data.statusCode === 404) {
-      response.status(data.statusCode).json({
-        message: data.message
-      });
-    } else if (data.statusCode === 400) {
-      response.status(data.statusCode).json({
-        message: 'bad request'
-      });
-    } else if (data.statusCode === 200) {
-      response.status(data.statusCode).json({
-        message: data ? resultData : 'success'
-      });
-    } else {
-      response.status(500).json({
-        message: 'Internal server error'
-      });
+  out: function (response, data) {
+    let statusCode = data.statusCode || 500;
+    let responseData = { message: 'Internal server error' };
+    if (statusCode === 401) {
+      responseData = { message: 'Unauthorized user' };
+    } else if (statusCode === 500) {
+      responseData = { message: 'Internal server error or invalid data' };
+    } else if (statusCode === 404) {
+      responseData = { message: data.message || 'Not found' };
+    } else if (statusCode === 400) {
+      responseData = { message: 'Bad request' };
+    } else if (statusCode === 200) {
+      responseData = { message: data.message || 'Success', data: data.resultData };
     }
+
+    response.status(statusCode).json(responseData);
   }
 };
