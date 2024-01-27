@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const loginschema = mongoose.Schema({
-  Username: {
+  Firstname: {
     type: String,
     required: true,
   },
@@ -14,5 +14,8 @@ const loginschema = mongoose.Schema({
     required: true,
     minlength: 3,
   },
+  token: {
+    type: String,
+  }
 });
 module.exports = mongoose.model("login", loginschema);
