@@ -11,7 +11,7 @@ module.exports = {
     } else if (statusCode === 400) {
       responseData = { message: 'Bad request' };
     } else if (statusCode === 200) {
-      responseData = { message: data.message || 'Success', data: data.resultData };
+      responseData = { message: data.message || 'Success' };
     }
 
     response.status(statusCode).json(responseData);

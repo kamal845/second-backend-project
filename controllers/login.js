@@ -5,6 +5,7 @@ const loginModel = require("../models/login-model");
 const signupModel = require("../models/signup-model");
 const keys = require("../help/keys");
 const jwt = require("jsonwebtoken");
+const Blacklist=require("../models/Blacklist-model");
 const { create_token } = require("../controllers/signup");
 module.exports = {
   securePassword: async (password) => {
@@ -15,7 +16,6 @@ module.exports = {
       throw new Error("Password hashing failed");
     }
   },
-
   login: async (req, res) => {
     try {
       const email = req.body.Email;
@@ -75,5 +75,60 @@ return res.status(200).json({
       error: error.message, // Log the error message
     });
   } 
-  }  
+  },
+  //verify token
+  verifyToken: async (req, res, next) => {
+    const token =
+      req.body.token || req.query.token || req.headers["authorization"];
+    if (!token) {
+      return res.status(403).json({
+        success: false,
+        msg: "this session is expired please try again",
+      });
+    }
+    try {
+        const bearer=token.split(' ');
+        const bearerToken= bearer[1];
+        const blacklistedToken=await Blacklist.findOne({token:bearerToken});
+        const decodedData=jwt.verify(bearerToken,keys.secret_jwt);
+        req.user=decodedData
+    } 
+catch (error) {
+        return res.status(400).json({
+            success:false,
+            msg:"invalid token"
+        })
+    }
+   return next(); 
+  },
+  //logout
+  logout: async (req, res) => {
+    try {
+      const token = req.body.token || req.query.token || req.headers['authorization'];
+      console.log("Original Token:", token);
+      const bearer = token.split(' ');
+      const bearerToken = bearer[1];
+      console.log("Token blacklisted successfully:", bearerToken);
+  
+      // Use a different name for the instance, e.g., blacklistInstance
+      const blacklistInstance = new Blacklist({
+        token: bearerToken
+      });
+  
+      await blacklistInstance.save();
+  
+      // res.setHeader('Clear-Site-Data','"cookies","storage"');
+      return res.status(200).json({
+        success: true,
+        msg: "successfully logged out",
+        blacklistedToken: bearerToken
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(400).json({
+        success: false,
+        msg: "not done successfully"
+      });
+    }
+  }
 };
